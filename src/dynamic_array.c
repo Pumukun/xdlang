@@ -1,6 +1,6 @@
 #include "dynamic_array.h"
 
-void check_address(void* p)
+void check_address(void* p);
 
 dArray* new_dArray() {
 	dArray* array = (dArray*)malloc(sizeof(dArray));
@@ -8,7 +8,7 @@ dArray* new_dArray() {
 
 	array->size = 0;
 	array->capacity = 0;
-	array->data = malloc(array->size * sizeof(Token*));
+	array->data = (Token*)malloc(array->size * sizeof(Token*));
 	check_address(array->data);
 
 	array->push = &dArray_push;
@@ -24,15 +24,15 @@ void dArray_push(dArray* arr, Token* input) {
 	arr->data = realloc(arr->data, arr->size * sizeof(Token*));
 	check_address(arr->data);
 
-	arr->data[arr->size - 1] = (Token*)malloc((strlen(input) + 1) * sizeof(Token));
-	check_address(arr->data[arr->size - 1]);
+	arr->data[arr->size - 1] = (Token*)malloc((strlen(input->lexeme) + 1) * sizeof(Token));
+	check_address(&arr->data[arr->size - 1]);
 }
 
 void dArray_popback(dArray* arr) {
 	if (arr->size == 0) {
 		exit(EXIT_FAILURE);
 	}
-	free(arr->data[arr->size - 1]);
+	free(&arr->data[arr->size - 1]);
     arr->data[arr->size - 1] = NULL;
     
     arr->size--;
@@ -43,7 +43,7 @@ void dArray_popback(dArray* arr) {
 
 void dArray_foreach(dArray* arr, void (*f_ptr)(Token*)) {
 	for (ui64 i = 0; i < arr->size; i++) {
-		f_ptr(arr->data[i]);
+		f_ptr(&arr->data[i]);
 	}
 }
 

@@ -15,7 +15,7 @@ $(EXECUTABLE): $(OBJECTS)
 	@mkdir -p $(BIN_DIR)
 	$(CC) $(CCFLAGS) $^ -o $@
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CCFLAGS) -c $< -o $@
 

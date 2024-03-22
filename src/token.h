@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "stdinc.h"
 
@@ -92,7 +93,8 @@ enum Operator_type {
 	LOWER	= 414,		///< <
 	
 	GREQUAL	= 415,		///< >=
-	LEQUAL	= 416		///< <=
+	LEQUAL	= 416,		///< <=
+	NOT		= 417		///< !
 };
 
 /**

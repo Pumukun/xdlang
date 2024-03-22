@@ -64,7 +64,7 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 			pos++;
 
 			while (*pos < strlen(input) && input[*pos] != '\"') {
-				strcat(token->lexeme, strcat(token->lexeme, (char*)input[*pos]));
+				strcat(token->lexeme, strcat(token->lexeme, &input[*pos]));
 				pos++;
 			}
 				
@@ -77,16 +77,27 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 		}
 
 		if (is_digit(c)) {
-			strcat(lexeme, (char*)c);
+			bool float_flag = false;
+			strcat(lexeme, &c);
 			pos++;
 
-			while (*pos < strlen(input) && is_digit(input[*pos])) {
-				strcat(lexeme, input[*pos]);
+			while ((*pos < strlen(input) && is_digit(input[*pos])) || input[*pos] == '.') {
+				input[*pos] == '.' ? float_flag = true : false;
+				strcat(lexeme, &input[*pos]);
 				pos++;
+			}
+
+			// check is float valid
+			if (float_flag) {
+				token->type = DIGIT;
+				token->subtype = FLOAT32;
+				token->pos = *pos - strlen(lexeme);
+				token->line = *line;
+				return token;
 			}
 			
 			token->type = DIGIT;
-			token->subtype = INT16;
+			token->subtype = INT32;
 			strcat(token->lexeme, lexeme);
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
@@ -94,11 +105,11 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 		}
 
 		if (is_alpha(c)) {
-			strcat(lexeme, (char*)c);
+			strcat(lexeme, &c);
 			pos++;
 
-			while (pos < strlen(input) && (is_alpha(input[pos]) || is_digit(input[pos]))) {
-				strcat(lexeme, input[*pos]);
+			while (*pos < strlen(input) && (is_alpha(input[*pos]) || is_digit(input[*pos]))) {
+				strcat(lexeme, &input[*pos]);
 				pos++;
 			}
 
@@ -112,8 +123,8 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 			}
 
 			strcpy(token->lexeme, lexeme);
-			token->pos = pos - strlen(lexeme);
-			token->line = line;
+			token->pos = *pos - strlen(lexeme);
+			token->line = *line;
 			return token;
 		}
 
@@ -121,15 +132,56 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 			lexeme += c;
 			pos++;
 
-			while (pos < (int)input.length() && is_operator(input[pos])) {
-				lexeme += input[pos];
+			while (*pos < strlen(input) && is_operator(input[*pos])) {
+				lexeme += input[*pos];
 				pos++;
 			}
 
-			if (lexeme == "=") {
-				token->type = OPERATOR;
-			} else { token->type = OPERATOR; }
-
+			if (strlen(lexeme) == 1) {
+				switch (lexeme[0]) {
+					case '=':
+						token->subtype = ASSIGN;
+						break;
+					case '+':
+						token->subtype = PLUS;
+						break;
+					case '-':
+						token->subtype = MINUS;
+						break;
+					case '*':
+						token->subtype = MUL;
+						break;
+					case '/':
+						token->subtype = DIV;
+						break;
+					case '^':
+						token->subtype = POW;
+						break;
+					case '!':
+						token->subtype = NOT;
+						break;
+					case '<':
+						token->subtype = LOWER;
+						break;
+					case '>':
+						token->subtype = GREATER;
+						break;
+				}
+			} else {
+				if (strcmp(lexeme, "==") == 0) {
+					token->subtype = EQUAL;
+				} else if (strcmp(lexeme, "!=") == 0) {
+					token->subtype = NEQUAL;
+				} else if (strcmp(lexeme, ">=") == 0) {
+					token->subtype = GREQUAL;
+				} else if (strcmp(lexeme, "<=") == 0) {
+					token->subtype = LEQUAL;
+				} else if (strcmp(lexeme, "->") == 0) {
+					token->subtype = ARROW;
+				}
+				break;
+			}
+			token->type = OPERATOR;
 			strcat(token->lexeme, lexeme);
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
@@ -140,10 +192,10 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 			lexeme += c;
 			pos++;
 
-			token.set_type(PUNCTUATION);
-			token.set_lexeme(lexeme);
-			token.set_pos(pos - (int)lexeme.size());
-			token.set_line(line);
+			token->type = PUNCTUATION;
+			strcat(token->lexeme, lexeme);
+			token->pos = *pos - strlen(lexeme);
+			token->line = *line;
 			return token;
 		}
 
@@ -151,25 +203,17 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 			lexeme += c;
 			pos++;
 
-			token.set_type(SEMICOLON);
-			token.set_lexeme(lexeme);
-			token.set_pos(pos - (int)lexeme.size());
-			token.set_line(line);
+			token->type = PUNCTUATION;
+			strcat(token->lexeme, lexeme);
+			token->pos = *pos - strlen(lexeme);
+			token->line = *line;
 			return token;
 		}
 
 		pos++;
-
-		if (!is_alpha(c) && !is_digit(c) && !is_operator(c) && !is_punctuation(c)) {
-			string msg = "Error on line: " + to_string(line) + ", pos: " + to_string(pos) + ", unknown Token: " + input[pos-1] + "\n";
-			syntax_errors.push_back(msg);
-		}
 	}
 
-	token.set_type(END);
-	token.set_lexeme("");
-	token.set_pos(pos);
-	token.set_line(line);
+	token = new_Token(END, NULL, *pos, *line);
 	return token;
 }
 
@@ -181,7 +225,7 @@ Token* tokenize(const char* input) {
 	ui64 tmp_line = 1;
 
 	do {
-		token = next_token(&input, &pos, &tmp_line);
-		out_arr->push(&out_arr, &token);
-	} while (token.get_lexeme() != "");
+		*token = next_token(input, &pos, &tmp_line);
+		out_arr->push(out_arr, token);
+	} while (strcmp(token->lexeme, "") != 0);
 }

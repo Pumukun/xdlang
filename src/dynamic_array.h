@@ -1,9 +1,9 @@
 #ifndef DYNAMIC_ARRAY_H
 #define DYNAMIC_ARRAY_H
 
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
+#include <stdio.h>
+
+#include "token.h"
 
 typedef struct dArray {
 	Token* data;
