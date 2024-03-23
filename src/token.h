@@ -113,13 +113,6 @@ typedef struct Token {
 	ui64 line;
 } Token;
 
-Token* new_Token(i16 atype, char* alexeme, i64 apos, i64 aline) {
-	Token* token = (Token*)malloc(sizeof(Token));
-	token->type = atype;
-	strcpy(token->lexeme, alexeme);
-	token->pos = apos;
-	token->line = aline;
-	return token;
-}
+Token* new_Token(i16 atype, char* alexeme, i64 apos, i64 aline);
 
 #endif /* TOKEN_H */

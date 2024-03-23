@@ -217,7 +217,7 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 	return token;
 }
 
-Token* tokenize(const char* input) {
+dArray* tokenize(const char* input) {
 	dArray* out_arr = new_dArray(); 
 
 	Token* token;
@@ -225,7 +225,8 @@ Token* tokenize(const char* input) {
 	ui64 tmp_line = 1;
 
 	do {
-		*token = next_token(input, &pos, &tmp_line);
+		token = next_token(input, &pos, &tmp_line);
 		out_arr->push(out_arr, token);
 	} while (strcmp(token->lexeme, "") != 0);
+	return out_arr;
 }

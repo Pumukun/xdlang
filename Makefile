@@ -5,19 +5,19 @@ OBJ_DIR = obj
 BIN_DIR = bin
 
 SOURCES = $(wildcard $(SRC_DIR)/*.c)
-OBJECTS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SOURCES))
+OBJECTS = $(patsubst $(SRC_DIR),$(OBJ_DIR)/%.o,$(SOURCES))
 
 EXECUTABLE = $(BIN_DIR)/xdc
 
 all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CCFLAGS) $^ -o $@
-
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CCFLAGS) -c $< -o $@
+
+$(EXECUTABLE): $(OBJECTS)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CCFLAGS) $^ -o $@
 
 .PHONY: clean
 clean:

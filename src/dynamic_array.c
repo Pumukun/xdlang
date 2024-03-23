@@ -8,7 +8,7 @@ dArray* new_dArray() {
 
 	array->size = 0;
 	array->capacity = 0;
-	array->data = (Token*)malloc(array->size * sizeof(Token*));
+	array->data = (Token**)malloc(array->size * sizeof(Token*));
 	check_address(array->data);
 
 	array->push = &dArray_push;
@@ -24,8 +24,11 @@ void dArray_push(dArray* arr, Token* input) {
 	arr->data = realloc(arr->data, arr->size * sizeof(Token*));
 	check_address(arr->data);
 
-	arr->data[arr->size - 1] = (Token*)malloc((strlen(input->lexeme) + 1) * sizeof(Token));
+	arr->data[arr->size - 1] = (Token*)malloc(sizeof(Token*));
 	check_address(&arr->data[arr->size - 1]);
+
+	arr->data[arr->size - 1]->lexeme = (char*)malloc(strlen(input->lexeme) + 1);
+	check_address(arr->data[arr->size - 1]->lexeme);
 }
 
 void dArray_popback(dArray* arr) {
@@ -43,7 +46,7 @@ void dArray_popback(dArray* arr) {
 
 void dArray_foreach(dArray* arr, void (*f_ptr)(Token*)) {
 	for (ui64 i = 0; i < arr->size; i++) {
-		f_ptr(&arr->data[i]);
+		f_ptr(arr->data[i]);
 	}
 }
 

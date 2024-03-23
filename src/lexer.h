@@ -32,8 +32,8 @@ bool is_brace(char c);
 bool is_punctuation(char c);
 bool is_quote(char c);
 
-Token next_token(const char* input, ui64* pos, ui64* line);
+Token* next_token(const char* input, ui64* pos, ui64* line);
 
-Token* tokenize(const char* input);
+dArray* tokenize(const char* input);
 
 #endif /* LEXER_H */

@@ -6,7 +6,7 @@
 #include "token.h"
 
 typedef struct dArray {
-	Token* data;
+	Token** data;
 	ui64 capacity;
 	ui64 size;
 
