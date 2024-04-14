@@ -5,7 +5,7 @@
 
 int main() {
 
-	char* input = "if else elif for fun ret";
+	char* input = "x = 10 - 3;\ny = x + 5;\nif x == y { print x; } else { print y; }\n";
 	tokenize(input);
 
 	return 0;

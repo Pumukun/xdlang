@@ -21,14 +21,16 @@ dArray* new_dArray() {
 void dArray_push(dArray* arr, Token* input) {
 	arr->size++;
 
-	arr->data = realloc(arr->data, arr->size * sizeof(Token*));
+	arr->data = realloc(arr->data, arr->size * sizeof(Token**));
 	check_address(arr->data);
 
 	arr->data[arr->size - 1] = (Token*)malloc(sizeof(Token*));
 	check_address(&arr->data[arr->size - 1]);
 
-	arr->data[arr->size - 1]->lexeme = (char*)malloc(strlen(input->lexeme) + 1);
+	arr->data[arr->size - 1]->lexeme = (char*)malloc(sizeof(char));
 	check_address(arr->data[arr->size - 1]->lexeme);
+	
+	arr->data[arr->size - 1] = input;
 }
 
 void dArray_popback(dArray* arr) {

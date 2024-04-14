@@ -1,5 +1,16 @@
 #include "lexer.h"
 
+const char* DATA_TYPES[DATA_TYPES_ARR_LEN] = {
+	"i8", "i16", "i32","i64",
+	"ui8", "ui16", "ui32", "ui64",
+	"f32", "bool", "xd", "str"
+};
+
+const char* KEYWORDS[KWDS_ARR_LEN] = {
+	"if", "else", "elif",
+	"for", "fun", "ret"
+};
+
 i16 find_keyword(const char* input_lex) {
 	if (strcmp(input_lex, "if")) {
 		return IF;
@@ -220,7 +231,7 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 dArray* tokenize(const char* input) {
 	dArray* out_arr = new_dArray(); 
 
-	Token* token;
+	Token* token = new_Token(END, "", 0, 0);
 	ui64 pos = 0;
 	ui64 tmp_line = 1;
 

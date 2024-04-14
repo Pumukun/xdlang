@@ -10,17 +10,11 @@
 #include "token.h"
 #include "dynamic_array.h"
 
-const char* DATA_TYPES[] = {
-	"i8", "i16", "i32","i64",
-	"ui8", "ui16", "ui32", "ui64",
-	"f32", "bool", "xd", "str"
-};
+#define DATA_TYPES_ARR_LEN 12
+extern const char* DATA_TYPES[DATA_TYPES_ARR_LEN];
 
 #define KWDS_ARR_LEN 6
-const char* KEYWORDS[KWDS_ARR_LEN] = {
-	"if", "else", "elif",
-	"for", "fun", "ret"
-};
+extern const char* KEYWORDS[KWDS_ARR_LEN];
 
 i16 find_keyword(const char* input_lex);
 
