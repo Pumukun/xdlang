@@ -55,47 +55,48 @@ bool is_quote(char c) { return c == '\"' || c == '\''; }
 
 Token* next_token(const char* input, ui64* pos, ui64* line) {
 	Token* token = new_Token(END, NULL, *pos, *line);
-	char* lexeme = "";
+	char* lexeme = (char*)malloc(1);
+	lexeme[0] = '\0';
 
 	while (*pos < strlen(input)) {
 		char c = input[*pos];
 
 		if (c == ' ' || c == '\t' || c == '\r') {
-			pos++;
+			++(*pos);
 			continue;
 		}
 
 		if (c == '\n') {
-			line++;
-			pos++;
+			++(*line);
+			++(*pos);
 			continue;
 		}
 
 		if (is_quote(c)) {
-			pos++;
+			++(*pos);
 
 			while (*pos < strlen(input) && input[*pos] != '\"') {
 				strcat(token->lexeme, strcat(token->lexeme, &input[*pos]));
-				pos++;
+				++(*pos);
 			}
 				
 			token->type = STRING_LIT;
 			token->subtype = STRING_LIT;
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
-			pos++;
+			++(*pos);
 			return token;
 		}
 
 		if (is_digit(c)) {
 			bool float_flag = false;
 			strcat(lexeme, &c);
-			pos++;
+			++(*pos);
 
 			while ((*pos < strlen(input) && is_digit(input[*pos])) || input[*pos] == '.') {
 				input[*pos] == '.' ? float_flag = true : false;
 				strcat(lexeme, &input[*pos]);
-				pos++;
+				++(*pos);
 			}
 
 			// check is float valid
@@ -109,7 +110,7 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 			
 			token->type = DIGIT;
 			token->subtype = INT32;
-			strcat(token->lexeme, lexeme);
+			strcpy(token->lexeme, lexeme);
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
 			return token;
@@ -117,11 +118,11 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 
 		if (is_alpha(c)) {
 			strcat(lexeme, &c);
-			pos++;
+			++(*pos);
 
 			while (*pos < strlen(input) && (is_alpha(input[*pos]) || is_digit(input[*pos]))) {
 				strcat(lexeme, &input[*pos]);
-				pos++;
+				++(*pos);
 			}
 
 			i16 kwd = find_keyword(lexeme);
@@ -140,12 +141,12 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 		}
 
 		if (is_operator(c)) {
-			lexeme += c;
-			pos++;
+			strcat(lexeme, &c);
+			++(*pos);
 
 			while (*pos < strlen(input) && is_operator(input[*pos])) {
-				lexeme += input[*pos];
-				pos++;
+				strcat(lexeme, &input[*pos]);
+				++(*pos);
 			}
 
 			if (strlen(lexeme) == 1) {
@@ -193,35 +194,35 @@ Token* next_token(const char* input, ui64* pos, ui64* line) {
 				break;
 			}
 			token->type = OPERATOR;
-			strcat(token->lexeme, lexeme);
+			strcpy(token->lexeme, lexeme);
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
 			return token;
 		}
 
 		if (is_punctuation(c)) {
-			lexeme += c;
-			pos++;
+			strcat(lexeme, &c);
+			++(*pos);
 
 			token->type = PUNCTUATION;
-			strcat(token->lexeme, lexeme);
+			strcpy(token->lexeme, lexeme);
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
 			return token;
 		}
 
 		if (is_semicolon(c)) {
-			lexeme += c;
-			pos++;
+			strcat(lexeme, &c);
+			++(*pos);
 
 			token->type = PUNCTUATION;
-			strcat(token->lexeme, lexeme);
+			strcpy(token->lexeme, lexeme);
 			token->pos = *pos - strlen(lexeme);
 			token->line = *line;
 			return token;
 		}
 
-		pos++;
+		++(*pos);
 	}
 
 	token = new_Token(END, NULL, *pos, *line);
@@ -237,6 +238,7 @@ dArray* tokenize(const char* input) {
 
 	do {
 		token = next_token(input, &pos, &tmp_line);
+		printf("%s, ", token->lexeme);
 		out_arr->push(out_arr, token);
 	} while (strcmp(token->lexeme, "") != 0);
 	return out_arr;
